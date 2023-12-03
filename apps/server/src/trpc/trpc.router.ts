@@ -1,7 +1,8 @@
 import { INestApplication, Injectable } from '@nestjs/common';
-import { TrpcService } from '@server/trpc/trpc.service';
+import prisma from '@server/prisma';
 import * as trpcExpress from '@trpc/server/adapters/express';
 import { z } from 'zod';
+import { TrpcService } from './trpc.service';
 
 @Injectable()
 export class TrpcRouter {
@@ -11,13 +12,25 @@ export class TrpcRouter {
     hello: this.trpc.procedure
       .input(z.object({ name: z.string().optional() }))
       .query(({ input }) => {
-        return `Hello ${input.name ? input.name : `Bilbo`}`;
+        return `Hello ${input.name || 'there'} !`;
+      }),
+    createUser: this.trpc.procedure
+      .input(z.object({ name: z.string() }))
+      .mutation(async ({ input }) => {
+        console.log('>>> inputx', input);
+
+        const createdUser = await prisma.euc.create({
+          data: {
+            name: input.name,
+          },
+        });
+        return createdUser;
       }),
   });
 
   async applyMiddleware(app: INestApplication) {
     app.use(
-      `/trpc`,
+      '/trpc',
       trpcExpress.createExpressMiddleware({ router: this.appRouter }),
     );
   }

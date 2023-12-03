@@ -1,7 +1,6 @@
 import { trpc } from './trpc';
 
 export default async function Home() {
-  const res = await trpc.hello.query({ name: 'abuw' });
-  console.log('>>> ', res);
-  return <p>hello</p>;
+  const res = await trpc.createUser.mutate({ name: 'gonzo' });
+  return <p>{JSON.stringify(res)}</p>;
 }
