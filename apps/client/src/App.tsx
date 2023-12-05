@@ -1,11 +1,34 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { trpc } from './trpc';
 
+import { Socket, io } from 'socket.io-client';
 import EucForm from './components/eucForm';
 import { useEucStore } from './store';
 
 function App() {
   const { eucList, updateEucList, updateEucId } = useEucStore();
+  const [socket, setSocket] = useState<Socket>();
+
+  const sendMessage = (value: string) => {
+    socket?.emit('message', value);
+  };
+
+  const listenMessage = useCallback(async () => {
+    const res = await trpc.getAllEucWithRetailers.query();
+    updateEucList(res);
+  }, [updateEucList]);
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:8001');
+    setSocket(newSocket);
+  }, []);
+
+  useEffect(() => {
+    socket?.on('message', listenMessage);
+    return () => {
+      socket?.off('message', listenMessage);
+    };
+  }, [listenMessage, socket]);
 
   useEffect(() => {
     const fetchEucs = async () => {
@@ -29,7 +52,7 @@ function App() {
         ))}
       </div>
       <div className="flex-1">
-        <EucForm />
+        <EucForm sendMessage={sendMessage} />
       </div>
       <div className="w-[460px]">This is the retailer column</div>
     </div>

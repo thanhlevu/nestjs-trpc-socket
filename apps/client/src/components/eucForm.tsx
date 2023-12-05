@@ -31,7 +31,11 @@ const formSchema = z.object({
   bluetooth: z.boolean(),
 });
 
-export default function EucForm() {
+type EucFormProps = {
+  sendMessage: (val: string) => void;
+};
+
+export default function EucForm({ sendMessage }: EucFormProps) {
   const { addEuc, editEucId, eucList } = useEucStore();
   const editEuc = eucList.find((e) => e.id === editEucId);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -68,6 +72,7 @@ export default function EucForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const newEuc = await trpc.addEuc.mutate(values);
     addEuc(newEuc);
+    sendMessage('NEW_EUC_ADDED');
   }
 
   return (
@@ -107,7 +112,13 @@ export default function EucForm() {
               <FormItem className="rounded-xl">
                 <FormLabel>Max Speed (Km/h)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="" {...field} />
+                  <Input
+                    type="number"
+                    {...field}
+                    onChange={(event) =>
+                      field.onChange(parseInt(event.target.value))
+                    }
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -120,7 +131,13 @@ export default function EucForm() {
               <FormItem className="rounded-xl">
                 <FormLabel>Range (Km)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="" {...field} />
+                  <Input
+                    type="number"
+                    {...field}
+                    onChange={(event) =>
+                      field.onChange(parseInt(event.target.value))
+                    }
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -133,7 +150,13 @@ export default function EucForm() {
               <FormItem className="rounded-xl">
                 <FormLabel>Weight (Kg)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="" {...field} />
+                  <Input
+                    type="number"
+                    {...field}
+                    onChange={(event) =>
+                      field.onChange(parseInt(event.target.value))
+                    }
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
