@@ -20,7 +20,7 @@ function App() {
       <div className="flex flex-col w-[460px] bg-">
         <div className="flex justify-between">
           <p>list of EUC</p>
-          <button>Add New</button>
+          <button onClick={() => updateEucId(null)}>Add New</button>
         </div>
         {eucList.map((euc) => (
           <button key={euc.id} onClick={() => updateEucId(euc.id)}>

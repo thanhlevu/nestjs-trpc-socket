@@ -50,9 +50,19 @@ export default function EucForm() {
   });
 
   useEffect(() => {
-    if (editEucId && editEuc) {
-      form.reset(editEuc);
-    }
+    form.reset(
+      editEuc || {
+        id: '',
+        productName: '',
+        brand: '',
+        tire: 0,
+        maxSpeed: 0,
+        range: 0,
+        weight: 0,
+        suspension: false,
+        bluetooth: false,
+      },
+    );
   }, [editEucId, editEuc, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -163,7 +173,7 @@ export default function EucForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          {form.formState.isDirty && <Button type="submit">Submit</Button>}
         </form>
       </Form>
     </div>
