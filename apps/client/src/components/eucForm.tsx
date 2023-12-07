@@ -36,7 +36,7 @@ type EucFormProps = {
 };
 
 export default function EucForm({ sendMessage }: EucFormProps) {
-  const { addEuc, editEucId, eucList } = useEucStore();
+  const { editEucId, eucList, updateEucId } = useEucStore();
   const editEuc = eucList.find((e) => e.id === editEucId);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,9 +70,32 @@ export default function EucForm({ sendMessage }: EucFormProps) {
   }, [editEucId, editEuc, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const newEuc = await trpc.addEuc.mutate(values);
-    addEuc(newEuc);
-    sendMessage('NEW_EUC_ADDED');
+    if (editEuc) {
+      await trpc.updateEuc.mutate(values);
+      sendMessage('EUC_UPDATE');
+      updateEucId(null);
+    } else {
+      await trpc.addEuc.mutate(values);
+      sendMessage('NEW_EUC_ADDED');
+      form.reset(
+        editEuc || {
+          id: '',
+          productName: '',
+          brand: '',
+          tire: 0,
+          maxSpeed: 0,
+          range: 0,
+          weight: 0,
+          suspension: false,
+          bluetooth: false,
+        },
+      );
+    }
+  }
+
+  async function onDelete() {
+    await trpc.deleteEuc.mutate({ id: editEuc!.id });
+    sendMessage('EUC_DELETE');
   }
 
   return (
@@ -197,6 +220,16 @@ export default function EucForm({ sendMessage }: EucFormProps) {
             )}
           />
           {form.formState.isDirty && <Button type="submit">Submit</Button>}
+          {editEuc && (
+            <Button
+              type="button"
+              onClick={onDelete}
+              variant={'destructive'}
+              className="bg-red-500"
+            >
+              Delete
+            </Button>
+          )}
         </form>
       </Form>
     </div>

@@ -1,5 +1,5 @@
 {
-  "name": "umi-web-game",
+  "name": "nestjs-trpc-socket",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

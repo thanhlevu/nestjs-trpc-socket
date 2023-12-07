@@ -15,6 +15,7 @@ function App() {
 
   const listenMessage = useCallback(async () => {
     const res = await trpc.getAllEucWithRetailers.query();
+
     updateEucList(res);
   }, [updateEucList]);
 
@@ -45,11 +46,13 @@ function App() {
           <p>list of EUC</p>
           <button onClick={() => updateEucId(null)}>Add New</button>
         </div>
-        {eucList.map((euc) => (
-          <button key={euc.id} onClick={() => updateEucId(euc.id)}>
-            {euc.productName}
-          </button>
-        ))}
+        {eucList
+          .sort((a, b) => a.productName.localeCompare(b.productName))
+          .map((euc) => (
+            <button key={euc.id} onClick={() => updateEucId(euc.id)}>
+              {euc.productName}
+            </button>
+          ))}
       </div>
       <div className="flex-1">
         <EucForm sendMessage={sendMessage} />
